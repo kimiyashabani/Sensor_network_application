@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
         try {
             // Set up the persistence layer
             MemoryPersistence persistence = new MemoryPersistence();
-
             temperatureValue = findViewById(R.id.temperatureValueValue);
             humidityValue = findViewById(R.id.HumidityValue);
             pressureValue = findViewById(R.id.pressureValue);
