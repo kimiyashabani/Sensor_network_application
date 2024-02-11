@@ -227,20 +227,7 @@ public class MainActivity extends AppCompatActivity {
                                 ZValue.setText(feed.getString("field7"));
                             }
 
-
                         }
-
-
-
-                        /*
-                        humidityValue.setText(feed.getString("field2"));
-                        pressureValue.setText(feed.getString("field3"));
-                        batteryValue.setText(feed.getString("field4"));
-                        XValue.setText(feed.getString("field5"));
-                        YValue.setText(feed.getString("field6"));
-                        ZValue.setText(feed.getString("field7"));
-
-                         */
 
 
                     }catch (Exception ex){

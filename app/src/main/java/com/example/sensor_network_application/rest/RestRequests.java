@@ -11,7 +11,7 @@ public interface RestRequests {
 
     //request to get the fields values
     @Headers({"Accept: application/json"})
-    @GET("feeds.json?api_key=82LN0KO0H75INS69&results=2")
+    @GET("feeds.json?api_key=UEWJJ9RX00ZLIJB2&results=2")
     Call<JsonObject> getValues();
 
 
