@@ -102,24 +102,17 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
                     Log.d("SUBS", "A message arrived");
-                    String payload = new String(message.getPayload());
-                    try {
-                        JSONObject jsonPayload = new JSONObject(payload);
 
-                        String field1Value = jsonPayload.optString("field1");
-                        String field2Value = jsonPayload.optString("field2");
+                    String field1Value = message.toString();
 
-                        // Update UI with the received values
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                temperatureValue.setText(field1Value);
-                                humidityTextView.setText(field1Value);
-                            }
-                        });
-                    } catch (JSONException e) {
-                        Log.e("TAG", "Error parsing JSON: " + e.getMessage());
-                    }
+                    // Update UI with the received values
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            temperatureValue.setText(field1Value);
+                        }
+                    });
+
 
                 }
 
