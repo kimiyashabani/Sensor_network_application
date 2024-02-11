@@ -3,7 +3,9 @@ package com.example.sensor_network_application;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
@@ -20,6 +22,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.util.Log;
@@ -57,11 +61,24 @@ public class MainActivity extends AppCompatActivity {
     TextView ZValue;
     MqttClient client;
 
+    String lat;
+    String longg;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getValues();
+
+        Button b = findViewById(R.id.buttonMaps);
+
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:" + lat +"," + longg +"?q=" + lat + "," + longg + "End-node"));
+                startActivity(intent);
+            }
+        });
 
         try {
             // Set up the persistence layer
@@ -189,6 +206,10 @@ public class MainActivity extends AppCompatActivity {
                     try{
                         // get json in the body of the response message
                         JSONObject js = new JSONObject(response.body().toString());
+
+                        lat = js.getJSONObject("channel").getString("latitude");
+                        longg = js.getJSONObject("channel").getString("longitude");
+
                         JSONArray values = js.getJSONArray("feeds");
 
 
