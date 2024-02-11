@@ -1,6 +1,9 @@
 package com.example.sensor_network_application;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
@@ -13,28 +16,37 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 import android.os.Bundle;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.example.sensor_network_application.rest.RestRequests;
+import com.example.sensor_network_application.rest.ServiceGenerator;
+import com.google.gson.JsonObject;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class MainActivity extends AppCompatActivity {
 
-    //MQTT
-    private static final String BROKER_URL = "tcp://mqtt3.thingspeak.com:1883";
     private static final String CLIENT_ID = "JwIBCDIyAxEGGBozBgYLGDg";
-    final String topic = "channels/2425312/subscribe/fields/+";
-    private final String username = "JwIBCDIyAxEGGBozBgYLGDg";
-    private final String password = "H6N/1Vyt6HvzFLAdGhPKKoHn";
+    private static final String BROKER = "tcp://mqtt3.thingspeak.com:1883";
     int qos = 0;
-    public static final String LOADWEBTAG = "LOAD_WEB_TAG";
-    private static final String URL_THINGSPEAK  = "https://thingspeak.com/channels/2422897";
+    final String topic = "channels/2425312/subscribe/fields/+";
+    private final String user = "JwIBCDIyAxEGGBozBgYLGDg";
+    private final String psswrd = "H6N/1Vyt6HvzFLAdGhPKKoHn";
+
 
     TextView temperatureValue;
     TextView humidityValue;
@@ -44,14 +56,12 @@ public class MainActivity extends AppCompatActivity {
     TextView YValue;
     TextView ZValue;
     MqttClient client;
-    ExecutorService es;
-    private String threadAndClass; // to clearly identify logs
-    private static final String CONTENT_TYPE = "text/html";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getValues();
 
         try {
             // Set up the persistence layer
@@ -65,26 +75,21 @@ public class MainActivity extends AppCompatActivity {
             ZValue = findViewById(R.id.ZAccValue);
 
             // Initialize the MQTT client
-            client = new MqttClient(BROKER_URL, CLIENT_ID, persistence);
-            Log.d("TAG", "Estoy en el onCreate!!!");
+            client = new MqttClient(BROKER, CLIENT_ID, persistence);
 
             MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(true);
-            connOpts.setUserName(username);
-            connOpts.setPassword(password.toCharArray());
+            connOpts.setUserName(user);
+            connOpts.setPassword(psswrd.toCharArray());
+
+            //connect to broker
             client.connect(connOpts);
-            Log.d("TAG", "connected!!!");
-            Toast.makeText(this, "connected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Connected to broker", Toast.LENGTH_SHORT).show();
 
-            Log.d("TAG", "Empiezo a subscribirme");
-
-            // Subscribe to the topic
+            //subscribed
             client.subscribe(topic, qos);
-
-            Log.d("TAG", "Subscribed to topic");
-            Toast.makeText(this, "Subscribing to topic " + topic, Toast.LENGTH_SHORT).show();
-            //client.subscribe(subscriptionTopic, qos);
-            //Toast.makeText(this, "Subscribing to topic "+ subscriptionTopic, Toast.LENGTH_SHORT).show();
+            Log.d("TAG", "Subscribed");
+            Toast.makeText(this, "Subscribed to topic " + topic, Toast.LENGTH_SHORT).show();
 
             client.setCallback(new MqttCallback() {
                 @Override
@@ -92,15 +97,13 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("TAG", "Connection lost");
                     try {
                         client.connect();
-                        Log.d("TAG", "Reconnected to the broker");
                     } catch (MqttException e) {
-                        Log.e("TAG", "Failed to reconnect to the broker: " + e.getMessage());
+                        Log.e("TAG", "Failed to connect: " + e.getMessage());
                     }
                 }
 
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
-                    Log.d("SUBS", "A message arrived");
                     String payload = message.toString();
 
                     switch (topic) {
@@ -173,7 +176,54 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    void setValue(String str){
-        temperatureValue.setText(str);
+    public void getValues(){
+        //get retrofit instance
+        RestRequests rest = ServiceGenerator.createService(RestRequests.class);
+        //execute request
+        Call<JsonObject> resp = rest.getValues();
+        resp.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if(response.code() == 200){
+                    //if it was a successfully request
+                    try{
+                        // get json in the body of the response message
+                        JSONObject js = new JSONObject(response.body().toString());
+                        JSONArray values = js.getJSONArray("feeds");
+                        JSONObject feed = values.getJSONObject(0);
+
+                        temperatureValue = findViewById(R.id.temperatureValueValue);
+                        humidityValue = findViewById(R.id.HumidityValue);
+                        pressureValue = findViewById(R.id.pressureValue);
+                        batteryValue = findViewById(R.id.BatterylevelValue);
+                        XValue = findViewById(R.id.XAccValue);
+                        YValue= findViewById(R.id.YAccValue);
+                        ZValue = findViewById(R.id.ZAccValue);
+
+                        //set values in the interface
+                        temperatureValue.setText(feed.getString("field1"));
+                        humidityValue.setText(feed.getString("field2"));
+                        pressureValue.setText(feed.getString("field3"));
+                        batteryValue.setText(feed.getString("field4"));
+                        XValue.setText(feed.getString("field5"));
+                        YValue.setText(feed.getString("field6"));
+                        ZValue.setText(feed.getString("field7"));
+
+
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+                }else{
+                    Toast.makeText(getApplicationContext(), "Error getting values", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), "Failure: check internet connection", Toast.LENGTH_SHORT).show();
+                Log.d("Failure", t.toString());
+            }
+        });
     }
+
 }
