@@ -40,12 +40,12 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String CLIENT_ID = "JwIBCDIyAxEGGBozBgYLGDg";
+    private static final String CLIENT_ID = "FCEpCQUHESInLQohNxsiAio";
     private static final String BROKER = "tcp://mqtt3.thingspeak.com:1883";
     int qos = 0;
-    final String topic = "channels/2425312/subscribe/fields/+";
-    private final String user = "JwIBCDIyAxEGGBozBgYLGDg";
-    private final String psswrd = "H6N/1Vyt6HvzFLAdGhPKKoHn";
+    final String topic = "channels/2422894/subscribe/fields/+";
+    private final String user = "FCEpCQUHESInLQohNxsiAio";
+    private final String psswrd = "+/Y4P8d/ZpSi/KeI0XXJ+O/H";
 
 
     TextView temperatureValue;
@@ -190,24 +190,57 @@ public class MainActivity extends AppCompatActivity {
                         // get json in the body of the response message
                         JSONObject js = new JSONObject(response.body().toString());
                         JSONArray values = js.getJSONArray("feeds");
-                        JSONObject feed = values.getJSONObject(0);
 
-                        temperatureValue = findViewById(R.id.temperatureValueValue);
-                        humidityValue = findViewById(R.id.HumidityValue);
-                        pressureValue = findViewById(R.id.pressureValue);
-                        batteryValue = findViewById(R.id.BatterylevelValue);
-                        XValue = findViewById(R.id.XAccValue);
-                        YValue= findViewById(R.id.YAccValue);
-                        ZValue = findViewById(R.id.ZAccValue);
 
-                        //set values in the interface
-                        temperatureValue.setText(feed.getString("field1"));
+                        for(int i=0; i<2; i++){
+                            JSONObject feed = values.getJSONObject(i);
+
+                            temperatureValue = findViewById(R.id.temperatureValueValue);
+                            humidityValue = findViewById(R.id.HumidityValue);
+                            pressureValue = findViewById(R.id.pressureValue);
+                            batteryValue = findViewById(R.id.BatterylevelValue);
+                            XValue = findViewById(R.id.XAccValue);
+                            YValue= findViewById(R.id.YAccValue);
+                            ZValue = findViewById(R.id.ZAccValue);
+
+
+                            //set values in the interface
+                            if (!feed.isNull("field1")){
+                                temperatureValue.setText(feed.getString("field1"));
+                            }
+                            if (!feed.isNull("field2")){
+                                humidityValue.setText(feed.getString("field2"));
+                            }
+                            if (!feed.isNull("field3")){
+                                pressureValue.setText(feed.getString("field3"));
+                            }
+                            if (!feed.isNull("field4")){
+                                batteryValue.setText(feed.getString("field4"));
+                            }
+                            if (!feed.isNull("field5")){
+                                XValue.setText(feed.getString("field5"));
+                            }
+                            if (!feed.isNull("field6")){
+                                YValue.setText(feed.getString("field6"));
+                            }
+                            if (!feed.isNull("field7")){
+                                ZValue.setText(feed.getString("field7"));
+                            }
+
+
+                        }
+
+
+
+                        /*
                         humidityValue.setText(feed.getString("field2"));
                         pressureValue.setText(feed.getString("field3"));
                         batteryValue.setText(feed.getString("field4"));
                         XValue.setText(feed.getString("field5"));
                         YValue.setText(feed.getString("field6"));
                         ZValue.setText(feed.getString("field7"));
+
+                         */
 
 
                     }catch (Exception ex){

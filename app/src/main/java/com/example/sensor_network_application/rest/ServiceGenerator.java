@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ServiceGenerator {
     //Class to get an intance of the retrofit instance needed to execute the rest function defines in RestRequest.java interface
     //Base uri for all the requests
-    private static final String BASE_URI = "https://api.thingspeak.com/channels/2425312/";
+    private static final String BASE_URI = "https://api.thingspeak.com/channels/2428811/";
     private static Retrofit.Builder builder = new Retrofit.Builder()
             .baseUrl(BASE_URI)
             .client(new OkHttpClient.Builder().addInterceptor((
