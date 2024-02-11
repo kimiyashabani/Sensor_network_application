@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     //MQTT
     private static final String BROKER_URL = "tcp://mqtt3.thingspeak.com:1883";
     private static final String CLIENT_ID = "JwIBCDIyAxEGGBozBgYLGDg";
-    final String topic = "channels/2425312/subscribe";
+    final String topic = "channels/2425312/subscribe/fields/+";
     private final String username = "JwIBCDIyAxEGGBozBgYLGDg";
     private final String password = "H6N/1Vyt6HvzFLAdGhPKKoHn";
     int qos = 0;
@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Subscribing to topic " + topic, Toast.LENGTH_SHORT).show();
             //client.subscribe(subscriptionTopic, qos);
             //Toast.makeText(this, "Subscribing to topic "+ subscriptionTopic, Toast.LENGTH_SHORT).show();
+
             client.setCallback(new MqttCallback() {
                 @Override
                 public void connectionLost(Throwable cause) {
@@ -101,6 +102,25 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
                     Log.d("SUBS", "A message arrived");
+                    String payload = new String(message.getPayload());
+                    try {
+                        JSONObject jsonPayload = new JSONObject(payload);
+
+                        String field1Value = jsonPayload.optString("field1");
+                        String field2Value = jsonPayload.optString("field2");
+
+                        // Update UI with the received values
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                temperatureValue.setText(field1Value);
+                                humidityTextView.setText(field1Value);
+                            }
+                        });
+                    } catch (JSONException e) {
+                        Log.e("TAG", "Error parsing JSON: " + e.getMessage());
+                    }
+
                 }
 
                 @Override
