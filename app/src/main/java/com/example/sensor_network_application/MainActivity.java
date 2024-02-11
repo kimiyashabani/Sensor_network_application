@@ -37,12 +37,12 @@ public class MainActivity extends AppCompatActivity {
     private static final String URL_THINGSPEAK  = "https://thingspeak.com/channels/2422897";
 
     TextView temperatureValue;
-    TextView humidityTextView;
-    TextView pressureTextView;
-    TextView batteryTextView;
-    TextView XTextView;
-    TextView YTextView;
-    TextView ZTextView;
+    TextView humidityValue;
+    TextView pressureValue;
+    TextView batteryValue;
+    TextView XValue;
+    TextView YValue;
+    TextView ZValue;
     MqttClient client;
     ExecutorService es;
     private String threadAndClass; // to clearly identify logs
@@ -58,12 +58,12 @@ public class MainActivity extends AppCompatActivity {
             MemoryPersistence persistence = new MemoryPersistence();
 
             temperatureValue = findViewById(R.id.temperatureValueValue);
-            humidityTextView = findViewById(R.id.HumidityValue);
-            pressureTextView = findViewById(R.id.pressureValue);
-            batteryTextView = findViewById(R.id.BatterylevelValue);
-            XTextView = findViewById(R.id.XAccValue);
-            YTextView = findViewById(R.id.YAccValue);
-            ZTextView = findViewById(R.id.ZAccValue);
+            humidityValue = findViewById(R.id.HumidityValue);
+            pressureValue = findViewById(R.id.pressureValue);
+            batteryValue = findViewById(R.id.BatterylevelValue);
+            XValue = findViewById(R.id.XAccValue);
+            YValue= findViewById(R.id.YAccValue);
+            ZValue = findViewById(R.id.ZAccValue);
 
             // Initialize the MQTT client
             client = new MqttClient(BROKER_URL, CLIENT_ID, persistence);
@@ -102,25 +102,66 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
                     Log.d("SUBS", "A message arrived");
-                    String payload = new String(message.getPayload());
-                    try {
-                        JSONObject jsonPayload = new JSONObject(payload);
+                    String payload = message.toString();
 
-                        String field1Value = jsonPayload.optString("field1");
-                        String field2Value = jsonPayload.optString("field2");
-
-                        // Update UI with the received values
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                temperatureValue.setText(field1Value);
-                                humidityTextView.setText(field1Value);
-                            }
-                        });
-                    } catch (JSONException e) {
-                        Log.e("TAG", "Error parsing JSON: " + e.getMessage());
+                    switch (topic) {
+                        case "channels/2425312/subscribe/fields/field1":
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    temperatureValue.setText(payload);
+                                }
+                            });
+                            break;
+                        case "channels/2425312/subscribe/fields/field2":
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    humidityValue.setText(payload);
+                                }
+                            });
+                            break;
+                        case "channels/2425312/subscribe/fields/field3":
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    pressureValue.setText(payload);
+                                }
+                            });
+                            break;
+                        case "channels/2425312/subscribe/fields/field4":
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    batteryValue.setText(payload);
+                                }
+                            });
+                            break;
+                        case "channels/2425312/subscribe/fields/field5":
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    XValue.setText(payload);
+                                }
+                            });
+                            break;
+                        case "channels/2425312/subscribe/fields/field6":
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    YValue.setText(payload);
+                                }
+                            });
+                            break;
+                        case "channels/2425312/subscribe/fields/field7":
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ZValue.setText(payload);
+                                }
+                            });
+                            break;
                     }
-
                 }
 
                 @Override
