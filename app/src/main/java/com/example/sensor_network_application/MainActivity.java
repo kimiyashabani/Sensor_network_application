@@ -28,11 +28,14 @@ public class MainActivity extends AppCompatActivity {
 
     //MQTT
     private static final String BROKER_URL = "tcp://mqtt3.thingspeak.com:1883";
-    private static final String CLIENT_ID = "FCEpCQUHESInLQohNxsiAio";
-    private final String username = "FCEpCQUHESInLQohNxsiAio";
-    private final String password = "+/Y4P8d/ZpSi/KeI0XXJ+O/H";
-    int qos = 1;
-    MqttClient client;
+    private static final String CLIENT_ID = "JwIBCDIyAxEGGBozBgYLGDg";
+    final String topic = "channels/2425312/subscribe";
+    private final String username = "JwIBCDIyAxEGGBozBgYLGDg";
+    private final String password = "H6N/1Vyt6HvzFLAdGhPKKoHn";
+    int qos = 0;
+    public static final String LOADWEBTAG = "LOAD_WEB_TAG";
+    private static final String URL_THINGSPEAK  = "https://thingspeak.com/channels/2422897";
+
     TextView temperatureValue;
     TextView humidityTextView;
     TextView pressureTextView;
@@ -40,8 +43,10 @@ public class MainActivity extends AppCompatActivity {
     TextView XTextView;
     TextView YTextView;
     TextView ZTextView;
-    private static final String TAG = "MQTT";
-    Map<String, MqttCallback> topicCallbacks = new HashMap<>();
+    MqttClient client;
+    ExecutorService es;
+    private String threadAndClass; // to clearly identify logs
+    private static final String CONTENT_TYPE = "text/html";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Initialize the MQTT client
             client = new MqttClient(BROKER_URL, CLIENT_ID, persistence);
+            Log.d("TAG", "Estoy en el onCreate!!!");
 
             MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(true);
@@ -69,46 +75,45 @@ public class MainActivity extends AppCompatActivity {
             connOpts.setPassword(password.toCharArray());
             client.connect(connOpts);
             Log.d("TAG", "connected!!!");
+            Toast.makeText(this, "connected", Toast.LENGTH_SHORT).show();
 
-            //Subscribe to the topic
-            String[] topics = {"channels/2422894/publish", "channels/2428811/publish", "channels/2428994/publish"};
-            for (String topic : topics) {
-                client.subscribe(topic, qos);
-                Log.d("TAG", "Subscribed to topic: " + topic);
-                // Create a callback for each topic
-                MqttCallback callback = new MqttCallback() {
-                    @Override
-                    public void connectionLost(Throwable cause) {
-                        Log.d("TAG", "Connection lost");
-                        try {
-                            client.connect();
-                            Log.d("TAG", "Reconnected to the broker");
-                        } catch (MqttException e) {
-                            Log.e("TAG", "Failed to reconnect to the broker: " + e.getMessage());
-                        }
+            Log.d("TAG", "Empiezo a subscribirme");
+
+            // Subscribe to the topic
+            client.subscribe(topic, qos);
+
+            Log.d("TAG", "Subscribed to topic");
+            Toast.makeText(this, "Subscribing to topic " + topic, Toast.LENGTH_SHORT).show();
+            //client.subscribe(subscriptionTopic, qos);
+            //Toast.makeText(this, "Subscribing to topic "+ subscriptionTopic, Toast.LENGTH_SHORT).show();
+            client.setCallback(new MqttCallback() {
+                @Override
+                public void connectionLost(Throwable cause) {
+                    Log.d("TAG", "Connection lost");
+                    try {
+                        client.connect();
+                        Log.d("TAG", "Reconnected to the broker");
+                    } catch (MqttException e) {
+                        Log.e("TAG", "Failed to reconnect to the broker: " + e.getMessage());
                     }
+                }
 
-                    @Override
-                    public void messageArrived(String topic, MqttMessage message) throws Exception {
-                        Log.d("TAG", "A message arrived on topic: " + topic);
-                        String payload = new String(message.getPayload());
-                        // Handle the message payload here
-                    }
+                @Override
+                public void messageArrived(String topic, MqttMessage message) throws Exception {
+                    Log.d("SUBS", "A message arrived");
+                }
 
-                    @Override
-                    public void deliveryComplete(IMqttDeliveryToken token) {
-                        Log.d("TAG", "Delivery complete");
-                    }
-                };
-
-                // Add the callback to the map
-                topicCallbacks.put(topic, callback);
-            }
-
-
+                @Override
+                public void deliveryComplete(IMqttDeliveryToken token) {
+                    Log.d("TAG", "Delivery complete");
+                }
+            });
         } catch (MqttException e) {
             e.printStackTrace();
         }
+    }
 
+    void setValue(String str){
+        temperatureValue.setText(str);
     }
 }
