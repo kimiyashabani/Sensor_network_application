@@ -44,10 +44,11 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String CLIENT_ID = "FCEpCQUHESInLQohNxsiAio";
+
     private static final String BROKER = "tcp://mqtt3.thingspeak.com:1883";
     int qos = 0;
-    final String topic = "channels/2422894/subscribe/fields/+";
+    final String topic = "channels/2428811/subscribe/fields/+";
+    private static final String CLIENT_ID = "FCEpCQUHESInLQohNxsiAio";
     private final String user = "FCEpCQUHESInLQohNxsiAio";
     private final String psswrd = "+/Y4P8d/ZpSi/KeI0XXJ+O/H";
 
@@ -124,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                     String payload = message.toString();
 
                     switch (topic) {
-                        case "channels/2425312/subscribe/fields/field1":
+                        case "channels/2428811/subscribe/fields/field1":
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -132,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                             break;
-                        case "channels/2425312/subscribe/fields/field2":
+                        case "channels/2428811/subscribe/fields/field2":
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -140,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                             break;
-                        case "channels/2425312/subscribe/fields/field3":
+                        case "channels/2428811/subscribe/fields/field3":
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -148,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                             break;
-                        case "channels/2425312/subscribe/fields/field4":
+                        case "channels/2428811/subscribe/fields/field4":
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -156,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                             break;
-                        case "channels/2425312/subscribe/fields/field5":
+                        case "channels/2428811/subscribe/fields/field5":
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -164,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                             break;
-                        case "channels/2425312/subscribe/fields/field6":
+                        case "channels/2428811/subscribe/fields/field6":
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -172,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                             break;
-                        case "channels/2425312/subscribe/fields/field7":
+                        case "channels/2428811/subscribe/fields/field7":
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
